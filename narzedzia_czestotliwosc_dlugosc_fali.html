@@ -1,0 +1,152 @@
+<p><strong>Wyznaczenie wartości częstotliwości oraz długości fali</strong></p>
+
+<canvas id = "myc" width = "750" height = "200"></canvas>
+        <br> 
+        <select id="selectedVel" onchange="calwaveLeng(); calFreq()" style="width: 150px; position: relative; left: 300px; top:-180px" required >            
+            <optgroup label="Powietrze">
+                <option value="306.5"> Powietrze -40°C</option>
+                <option value="319.3">Powietrze -20°C</option>
+                <option selected="selected" value="331.8">Powietrze 0°C</option>
+                <option value="340.3">Powietrze 15°C</option>
+                <option value="343.8">Powietrze 20°C</option>
+                <option value="355.3">Powietrze 40°C</option>
+            </optgroup>
+            <option value="1500">Woda</option>
+            <option value="1180">Etanol</option>
+            <option value="2100">Ołów</option>
+            <option value="3800">Beton</option>
+        </select>
+
+        <br>
+        <input id = "frequency" type="number" placeholder = "Wpisz wartość" class = "input-element" onchange= "calwaveLeng()" value = "" min="0" maxlength = "8" style = "width: 100px; position: relative; left:150px; top:-158px">
+        <br>
+        <input id = "waveLength" type="number" placeholder = "Wpisz wartość" class = "input-element" onchange= "calFreq()" value = "" min="0" maxlength = "8" style = "width: 100px; position: relative; left:120px; top:-128px">
+        <br>
+        <input id = "showWaveLength"  value= ""  style = "color: green; border-style: none; width: 80px; position: relative; left:635px; top:-250px" readonly>
+        <br>
+        <input type = "button" onclick = "isUndefined()" id = 'try' value = "Oblicz" background-color = "white" style = "position: relative; left:80px; top:-130px"  ></button>
+        
+
+        <script type = "text/javascript"> 
+            
+            var g_canvas = document.getElementById("myc");
+            var g_ctx = g_canvas.getContext("2d");
+            var freq = parseFloat(document.getElementById("frequency").value);
+            var waveLeng = parseFloat(document.getElementById("waveLength").value);
+
+          function isUndefined() 
+            {  
+                if (freq.length == 0)
+                    { 
+                    alert("Wprowadz wartość częstotliwość");    
+                    return false; 
+                }                       
+                if (waveLeng.length == 0)
+                    { 
+                    alert("Wprowadz wartość długość fali");    
+                    return false; 
+                } 
+            }
+
+            function drawFrame()
+            {                                              // rysuje wykresy i podpisy 
+                g_ctx.clearRect(0, 0, g_canvas.width, g_canvas.height);
+                g_ctx.fillStyle = "#328DDC";               //kolor linii 
+                g_ctx.fillRect(0, 0, 750 , 200);        // rysowanie prostokata
+                g_ctx.fillStyle = "white";              // kolor linii 
+                g_ctx.fillRect(2, 2, 746, 196);         // rysowanie prostokata
+                g_ctx.lineWidth = 1;           
+                g_ctx.fillStyle = "black";
+                g_ctx.font = "bold 10pt Arial"; // ustawienia dla czcionki
+                g_ctx.fillStyle = "black";
+                g_ctx.font = "10pt Arial"; 
+                g_ctx.fillText("Wybierz w jakim ośrodku obliczyć parametry", 10, 35);
+                g_ctx.fillText("Częstotliwość [MHz] = ",  10, 80);
+                g_ctx.fillText("Długość fali [m] = ", 10, 130);
+
+                var y=180;
+                //draw axis
+                g_ctx.beginPath();
+                g_ctx.strokeStyle = "red";
+                g_ctx.moveTo(540,  10 + (y/2));
+                g_ctx.lineTo(540+y,  10+ (y/2));
+                g_ctx.stroke();
+
+                // draw sin wave
+                g_ctx.beginPath();
+                g_ctx.moveTo(x,y);
+                g_ctx.strokeStyle = "black";
+                for(var x=540; x<=180+540; x+=1){
+                    g_ctx.lineTo(x,((y/2)+10  + (y/2)  * Math.sin( ((x+-y/2)/90) * Math.PI)));
+                    g_ctx.stroke();
+                }
+                
+                //linia pokazująca długość fali i pomocnicze przerywane linie 
+                g_ctx.beginPath();
+                g_ctx.strokeStyle = "green";
+                g_ctx.moveTo(540,  -80 + (y/2));
+                g_ctx.lineTo(540+180,  -80+ (y/2));
+                g_ctx.stroke();
+
+                g_ctx.beginPath();
+                g_ctx.moveTo(540, -80 + (y/2));
+                g_ctx.lineTo(540, 10+(y/2));
+                g_ctx.setLineDash([10, 10]);
+                g_ctx.strokeStyle = 'green';
+                g_ctx.stroke();
+
+                g_ctx.beginPath();
+                g_ctx.moveTo(540+180, -80 + (y/2));
+                g_ctx.lineTo(540+180, 10+(y/2));
+                g_ctx.setLineDash([10, 10]);
+                g_ctx.strokeStyle = 'green';
+                g_ctx.stroke();
+
+
+            }
+
+            function calFreq() {    
+                var waveLeng = parseFloat(document.getElementById("waveLength").value);
+                if(waveLeng >= 0 ){
+                    document.getElementById("frequency").value =  parseFloat(document.getElementById("selectedVel").value/(waveLeng * 1000000)).toFixed(5);
+                    showWaveLength.value = waveLeng + " m";
+                }else if(isNaN(waveLeng) == true){
+                }
+                else{
+                    alert("Wpisz wartość większą od 0");
+                }
+            }
+
+            function calwaveLeng() {   
+                var freq = parseFloat(document.getElementById("frequency").value);
+                if(freq >= 0 ){
+                document.getElementById("waveLength").value =  parseFloat(document.getElementById("selectedVel").value/(freq * 1000000)).toFixed(5);
+                    if(freq == 0){
+                        showWaveLength.value = "";
+                    }else {
+                        showWaveLength.value =  parseFloat(document.getElementById("selectedVel").value/(freq * 1000000)).toFixed(5) + " m";
+                    }
+                }else if(isNaN(freq)==true){    
+                }else{
+                    alert("Wpisz wartość większą od 0");                 
+                }
+            }
+           drawFrame();                                 
+
+        </script>
+<p> <strong>Prędkość dźwięku w różnych temperaturach i ośrodkach: </strong>
+    <ul>
+        <li>Powietrze -40°C - 306,5 m/s </li>
+        <li>Powietrze -20°C - 319,3 m/s </li>
+        <li>Powietrze   0°C - 331,8 m/s </li>
+        <li>Powietrze  15°C - 340,3 m/s </li>
+        <li>Powietrze  20°C - 343,8 m/s </li>
+        <li>Powietrze  40°C - 355,3 m/s </li>
+        <li>Woda - 1500 m/s </li>
+        <li>Etanol - 1180 m/s </li>        
+        <li>Ołów - 2100 m/s </li>
+        <li>Beton - 3800 m/s </li>
+    </ul>
+</p>
+<p><h3>Obsługa programu:</h3></p>
+<p> W odpowiednich polach liczbowych należy wprowadzić wartości długości fali lub częstotliwości, a następnie należy naciskąć przycisk "Oblicz" lub nacisnąć klawisz "Enter".</p>
